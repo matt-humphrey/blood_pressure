@@ -1,0 +1,51 @@
+[project]
+name = "blood_pressure"
+version = "0.1.0"
+description = "Harmonise blood pressure variables for physical assessments."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "banksia",
+    "polars>=1.33.0",
+    "pointblank>=0.13.0",
+    "pyarrow>=21.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "altair>=5.5.0",
+    "marimo>=0.15.0",
+    "pytest>=8.4.1",
+    "ruff>=0.12.10",
+    "watchdog>=6.0.0",
+    "scipy",
+    "matplotlib",
+]
+
+[tool.uv.sources]
+banksia = { path = "C:/Users/00113294/Projects/banksia", editable = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+ignore = [
+    "E402", # module level import not at top of file
+    "E501", # line too long (maximum 100 characters)
+    "F811", # redefinition of unused name
+    "E203", # whitespace before ':'
+    "F841", # local variable 'name' is assigned to but never used
+    "E702", # multiple statements on one line (semicolon)
+]
+
+[tool.ruff.lint]
+exclude = ["docs", ".venv", "tests/*"]
+
+[tool.marimo.runtime]
+watcher_on_save = "autorun"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
