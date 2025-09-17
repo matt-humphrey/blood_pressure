@@ -14,12 +14,10 @@ dependencies = [
 [dependency-groups]
 dev = [
     "altair>=5.5.0",
-    "marimo>=0.15.0",
+    "marimo>=0.15.5",
     "pytest>=8.4.1",
-    "ruff>=0.12.10",
+    "ruff>=0.13.0",
     "watchdog>=6.0.0",
-    "scipy",
-    "matplotlib",
 ]
 
 [tool.uv.sources]
