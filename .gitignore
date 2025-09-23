@@ -11,6 +11,7 @@ wheels/
 
 # Other
 __marimo__/
+.pytest_cache/
 data/
 docs/
 img/
