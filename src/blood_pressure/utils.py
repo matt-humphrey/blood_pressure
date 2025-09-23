@@ -68,7 +68,9 @@ def transform_datasets(
     }
 
 
-def make_interim(file: Dataset, raw: Path = RAW_DATA) -> tuple[pl.DataFrame, pl.DataFrame]:
+def make_interim(
+    file: Dataset, raw: Path = RAW_DATA
+) -> tuple[pl.DataFrame, pl.DataFrame]:
     """
     Make the initial transformations from RAW to INTERIM data.
     """
