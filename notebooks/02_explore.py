@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.15.2"
+__generated_with = "0.15.5"
 app = marimo.App(width="medium")
 
 
@@ -455,15 +455,14 @@ def _(df, pb, pl):
         left=12.5,
         right=400,
         na_pass=True,
-        pre=lambda df: df.with_columns(pl.col(r"^G\w{3}_CYC\d$").replace({-99.0: None, -88.0: None, 888.8: None, 999.9: None})),
-        segments=("G217_INST", pb.seg_group(["Dinamap 1", "Dinamap 2", "Dinamap 3", "Dinamap 4"]))
+        pre=lambda df: df.with_columns(
+            pl.col(r"^G\w{3}_CYC\d$").replace({-99.0: None, -88.0: None, 888.8: None, 999.9: None})
+        ),
+        segments=("G217_INST", pb.seg_group(["Dinamap 1", "Dinamap 2", "Dinamap 3", "Dinamap 4"])),
     ).col_vals_eq(
-        columns=pb.matches(r"G217_CYC\d"),
-        value=888.8,
-        segments=("G217_INST", '        8')
+        columns=pb.matches(r"G217_CYC\d"), value=888.8, segments=("G217_INST", "        8")
     ).col_vals_null(
-        columns=pb.matches(r"G217_CYC\d"),
-        segments=("G217_INST", [None, ""])
+        columns=pb.matches(r"G217_CYC\d"), segments=("G217_INST", [None, ""])
     ).interrogate()
     return
 
@@ -488,7 +487,9 @@ def _(df, pl):
 
 @app.cell
 def _(df, pl):
-    df_bp = df.select("ID", "G214_XCAR", pl.col("^G214_BP(9|10|11|14|17|20|6[4-6]|2[1-3])$")).filter(~pl.all_horizontal(pl.exclude("ID").is_null()))
+    df_bp = df.select(
+        "ID", "G214_XCAR", pl.col("^G214_BP(9|10|11|14|17|20|6[4-6]|2[1-3])$")
+    ).filter(~pl.all_horizontal(pl.exclude("ID").is_null()))
     df_bp
     return
 
@@ -496,7 +497,8 @@ def _(df, pl):
 @app.cell
 def _(df, pb, pl):
     validation_misc = (
-        pb.Validate(data=df).col_vals_between(
+        pb.Validate(data=df)
+        .col_vals_between(
             columns=pb.matches(r"^G\w{3}_PWC170$"),
             left=25,
             right=344,
@@ -506,7 +508,9 @@ def _(df, pb, pl):
         .col_vals_in_set(
             columns=pb.matches(r"^G\w{3}_TECH$"),
             set=[1, 2, 3, None],
-            pre=lambda df: df.with_columns(pl.col(r"^G\w{3}_TECH$").replace({-99: None, -88: None})),
+            pre=lambda df: df.with_columns(
+                pl.col(r"^G\w{3}_TECH$").replace({-99: None, -88: None})
+            ),
         )
     ).interrogate()
 
@@ -515,74 +519,36 @@ def _(df, pb, pl):
 
 
 @app.cell
-def _(mo):
-    mo.md(r"""## `BPS1` to `BPS8`""")
+def _():
+    # Finally, let's check out XCAR in a little more depth
     return
 
 
 @app.cell
-def _(meta, pl):
-    m_bps = meta.filter(pl.col("basename").str.contains(r"BPS\d$")).sort(by="basename")
-    cols_bps = m_bps.to_series(0).to_list()
-    m_bps
-    return (cols_bps,)
-
-
-@app.cell
-def _(cols_bps, df, pl):
-    df.select(cols_bps).filter(~pl.all_horizontal(pl.exclude("ID").is_null())).with_columns(
-        pl.all().replace({-99: None, -88: None})
-    ).describe()
+def _(df, pl):
+    df.filter(pl.col("G214_XCAR").ne(1)).select("G214_XCAR", "G214_PWC170", pl.col(r"^G214_BP\d+$"))
     return
 
 
 @app.cell
-def _(df, pb, pl):
-    validation_bp41 = (
-        pb.Validate(data=df)
-        .col_vals_between(
-            columns=pb.matches(r"^G\w{3}_BP41$"),
-            left=67,
-            right=166,
-            na_pass=True,
-            pre=lambda df: df.with_columns(
-                pl.col(r"^G\w{3}_BP41$").replace({-99: None, -88: None})
-            ),
-        )
-        .col_vals_between(
-            columns=pb.matches(r"^G\w{3}_BP42$"),
-            left=34,
-            right=97,
-            na_pass=True,
-            pre=lambda df: df.with_columns(
-                pl.col(r"^G\w{3}_BP42$").replace({-99: None, -88: None})
-            ),
-        )
-        .col_vals_between(
-            columns=pb.matches(r"^G\w{3}_BP43$"),
-            left=55,
-            right=140,
-            na_pass=True,
-            pre=lambda df: df.with_columns(
-                pl.col(r"^G\w{3}_BP43$").replace({-99: None, -88: None})
-            ),
-        )
-        .col_vals_in_set(
-            columns=pb.matches(r"^G\w{3}_BP44$"),
-            set=[1, 2, None],
-            pre=lambda df: df.with_columns(
-                pl.col(r"^G\w{3}_BP44$").replace({-99: None, -88: None})
-            ),
-        )
+def _(df, pl):
+    df.filter(pl.col("G217_XCAR").ne(1)).select("G217_XCAR", "G217_PWC170", pl.col(r"^G217_BP\d+$"))
+    return
+
+
+@app.cell
+def _(df, pb):
+    pb.Validate(data=df).col_vals_null(
+        columns=pb.matches("G214_BP(9|10|11|14|17|20)"), segments=("G214_XCAR", None)
+    ).col_vals_not_null(
+        columns=pb.matches("G214_BP(9|10|11|14|17|20)"),
+        segments=("G214_XCAR", pb.seg_group([0, 1])),
+    ).col_vals_null(
+        columns=pb.matches("G217_BP(9|10|11|14|17|20)"), segments=("G217_XCAR", None)
+    ).col_vals_not_null(
+        columns=pb.matches("G217_BP(9|10|11|14|17|20)"),
+        segments=("G217_XCAR", pb.seg_group([0, 1])),
     ).interrogate()
-
-    validation_bp41
-    return (validation_bp41,)
-
-
-@app.cell
-def _(pb, validation_bp41):
-    validation_bp41.get_step_report(i=2, columns_subset=pb.matches("BP41"))
     return
 
 
