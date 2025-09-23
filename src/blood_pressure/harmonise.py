@@ -9,33 +9,57 @@ def sort_by_id(df: DataFrame) -> DataFrame:
 
 
 def replace_missing_values(df: DataFrame) -> DataFrame:
-    """Replace values for each given column that..."""
+    """Replace values for specified columns"""
     return df.with_columns(
         pl.col(r"^G\w{3}_BP\d+$").replace({-99: None, -88: None, 999: None}),
         pl.col(r"^G\w{3}_BP[DS][1-6]$").replace({-99: None, -88: None}),
         pl.col(r"^G\w{3}_SHR[1-6]$").replace({-99: None, -88: None}),
+        pl.col(r"^G\w{3}_TECH$").replace({-99: None, -88: None}),
     )
 
 
 def recast_types(df: DataFrame) -> DataFrame:
-    """Recast column types as new type"""
+    """Recast columns with new dtypes"""
     return df.with_columns(
         pl.col(r"^G\w{3}_BP\d+$").cast(pl.Int64),
         pl.col(r"^G\w{3}_BP[DS][1-6]$").cast(pl.Int64),
         pl.col(r"^G\w{3}_SHR[1-6]$").cast(pl.Int64),
+        pl.col(r"^G\w{3}_CYC[1-3]$").cast(pl.Int64),
+        pl.col(r"^G\w{3}_TECH$").cast(pl.Int64),
+        pl.col(r"^G\w{3}_XCAR$").cast(pl.Int64),
     )
 
 
 def apply_rounding(df: DataFrame) -> DataFrame:
-    """Recast column types as new type"""
+    """Apply rounding to specified float columns"""
     return df.with_columns(
         pl.col(r"^G\w{3}_PWC170$").cast(pl.Float64).round(2),
     )
 
 
 def recode_bp41(df: DataFrame) -> DataFrame:
-    """Replace errant value of 1110 with None"""
+    """Replace errant value of 1110 with None."""
     return df.with_columns(pl.col("G214_BP41").replace({1110: None}))
+
+
+def recode_xcar_g214(df: DataFrame) -> DataFrame:
+    """
+    Clean XCAR variable for G214.
+
+    Values of 0 were used in two cases where the participant started, but did not finish.
+    Values of 9 were used to represent "Missing", which is superfluous, and hence is removed.
+    """
+    return df.with_columns(pl.col("G214_XCAR").replace({9: None}))
+
+
+def recode_xcar_g217(df: DataFrame) -> DataFrame:
+    """
+    Clean XCAR variable for G217.
+
+    To harmonise with G214, values of 0 are removed (because in this case, they were only used when
+    the participant did not do the test at all).
+    """
+    return df.with_columns(pl.col("G217_XCAR").replace({0: None}))
 
 
 def update_time_for_g126_slpt(df: DataFrame) -> DataFrame:
@@ -60,8 +84,8 @@ final_transforms = [recast_types, sort_by_id]
 dataset_transforms = {
     "G126": [update_time_for_g126_slpt],
     "G208": [],
-    "G214": [apply_rounding, recode_bp41],
-    "G217": [apply_rounding],
+    "G214": [apply_rounding, recode_bp41, recode_xcar_g214],
+    "G217": [apply_rounding, recode_xcar_g217],
     "G222": [],
 }
 
