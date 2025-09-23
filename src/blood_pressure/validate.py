@@ -1,7 +1,8 @@
 import pointblank as pb
-import polars as pl
 from banksia import Metadata
 from pointblank import Validate
+
+__all__ = ["VALIDATIONS"]
 
 # TODO: create generic validation function which tests values in set for metadata with field values
 
@@ -20,12 +21,13 @@ def validate_cycling_baseline(validation: Validate) -> Validate:
         )
         .col_vals_between(columns=pb.matches(r"^G\w{3}_BP10$"), left=30, right=114, na_pass=True)
         .col_vals_between(columns=pb.matches(r"^G\w{3}_BP11$"), left=45, right=137, na_pass=True)
+        .col_vals_in_set(columns=pb.matches(r"^G\w{3}_TECH$"), set=[1, 2, 3, None])
     )
 
 
 def validate_cycling(validation: Validate) -> Validate:
     return (
-        validation.col_vals_between(columns=pb.matches(r"^G\w{3}_BP12"), set=[1, 2, None])
+        validation.col_vals_in_set(columns=pb.matches(r"^G\w{3}_BP12"), set=[1, 2, None])
         .col_vals_between(columns=pb.matches(r"^G\w{3}_BP13$"), left=56, right=152, na_pass=True)
         .col_vals_between(columns=pb.matches(r"^G\w{3}_BP14$"), left=46, right=173, na_pass=True)
         .col_vals_between(columns=pb.matches(r"^G\w{3}_BP15$"), left=45, right=188, na_pass=True)
@@ -33,7 +35,7 @@ def validate_cycling(validation: Validate) -> Validate:
         .col_vals_between(columns=pb.matches(r"^G\w{3}_BP17$"), left=58, right=181, na_pass=True)
         .col_vals_between(columns=pb.matches(r"^G\w{3}_BP18$"), left=52, right=189, na_pass=True)
         .col_vals_between(columns=pb.matches(r"^G\w{3}_PWC170$"), left=25, right=344, na_pass=True)
-        .col_vals_in_set(columns=pb.matches(r"^G\w{3}_TECH$"), set=[1, 2, 3, None])
+        .col_vals_in_set(columns=pb.matches(r"^G\w{3}_XCAR$"), set=[0, 1, None])
     )
 
 
@@ -93,4 +95,14 @@ def validate_sleep_blood_pressure(validation: Validate) -> Validate:
     )
 
 
-VALIDATIONS = {}
+VALIDATIONS = {
+    "G126": [validate_sleep_blood_pressure],
+    "G208": [
+        validate_cycling_baseline,
+        validate_cycling_g208,
+        validate_post_cycling_blood_pressure,
+    ],
+    "G214": [validate_cycling_baseline, validate_cycling, validate_post_cycling_blood_pressure],
+    "G217": [validate_cycling_baseline, validate_cycling, validate_post_cycling_blood_pressure],
+    "G222": [validate_sleep_blood_pressure],
+}
