@@ -1,5 +1,3 @@
-from typing import Any
-
 from banksia import Metadata
 
 __all__ = ["METADATA"]
@@ -78,5 +76,20 @@ METADATA: list[Metadata] = [
         field_width=1,
         var_type="ordinal",
         field_values={"1": "Good", "2": "Suspect", "3": "Poor"},
+    ),
+    Metadata(
+        basename="BPSL", label="Time BP assessment before sleep", field_type="Time", field_width=8
+    ),
+    Metadata(basename="SLPT", label="Time lights out", field_type="Time", field_width=8),
+    Metadata(
+        basename="WKBP", label="Time BP assessment after waking", field_type="Time", field_width=8
+    ),
+    Metadata(basename="WKT", label="Time woke up", field_type="Time", field_width=8),
+    Metadata(basename="SPRAT", label="Time set up started", field_type="Time", field_width=8),
+    Metadata(
+        basename="XCAR",
+        label="Completed cardiovascular endurance test",
+        field_width=1,
+        field_values={0: "No", 1: "Yes"},
     ),
 ]
