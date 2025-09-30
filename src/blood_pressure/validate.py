@@ -1,4 +1,7 @@
+from datetime import time
+
 import pointblank as pb
+import polars as pl
 from banksia import Metadata
 from pointblank import Validate
 
@@ -95,8 +98,17 @@ def validate_sleep_blood_pressure(validation: Validate) -> Validate:
     )
 
 
+def validate_sleep_times(validation: Validate) -> Validate:
+    return validation.col_vals_expr(
+        expr=pl.col(r"^G\w{3}_BPSL$").is_between(time(19, 30), time(23, 59))
+    ).col_vals_expr(
+        expr=pl.col(r"^G\w{3}_SLPT$").is_between(time(19, 30), time(23, 59))
+        | pl.col(r"^G\w{3}_SLPT$").is_between(time(0), time(1))
+    )
+
+
 VALIDATIONS = {
-    "G126": [validate_sleep_blood_pressure],
+    "G126": [validate_sleep_blood_pressure, validate_sleep_times],
     "G208": [
         validate_cycling_baseline,
         validate_cycling_g208,
@@ -104,5 +116,5 @@ VALIDATIONS = {
     ],
     "G214": [validate_cycling_baseline, validate_cycling, validate_post_cycling_blood_pressure],
     "G217": [validate_cycling_baseline, validate_cycling, validate_post_cycling_blood_pressure],
-    "G222": [validate_sleep_blood_pressure],
+    "G222": [validate_sleep_blood_pressure, validate_sleep_times],
 }
