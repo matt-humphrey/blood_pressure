@@ -241,8 +241,11 @@ DATASETS = {
             "G222_WKBP",
             "G222_SLPT",
             "G222_WKT",
+            "G222_BP_TIME",
         ],
-        "rename": {},
+        "rename": {
+            "G222_SCOM": "G222_SL_COM",
+        },
         "delete": [
             "G222_BPD7",
             "G222_BPD8",
