@@ -99,11 +99,24 @@ def validate_sleep_blood_pressure(validation: Validate) -> Validate:
 
 
 def validate_sleep_times(validation: Validate) -> Validate:
-    return validation.col_vals_expr(
-        expr=pl.col(r"^G\w{3}_BPSL$").is_between(time(19, 30), time(23, 59))
-    ).col_vals_expr(
-        expr=pl.col(r"^G\w{3}_SLPT$").is_between(time(19, 30), time(23, 59))
-        | pl.col(r"^G\w{3}_SLPT$").is_between(time(0), time(1))
+    return (
+        validation.col_vals_expr(
+            expr=pl.col(r"^G\w{3}_BPSL$").is_between(time(19, 30), time(23, 59))
+        )
+        .col_vals_expr(
+            expr=pl.col(r"^G\w{3}_SLPT$").is_between(time(19, 30), time(23, 59))
+            | pl.col(r"^G\w{3}_SLPT$").is_between(time(0), time(1))
+            | pl.col(r"^G\w{3}_SLPT$").eq(time(5, 30))
+        )
+        .col_vals_expr(
+            expr=pl.col(r"^G\w{3}_WKT$").is_between(time(3, 30), time(9))
+            | pl.col(r"^G\w{3}_WKT$").eq(time(0, 30))
+            | pl.col(r"^G\w{3}_WKT$").eq(time(2, 50))
+        )
+        .col_vals_expr(
+            expr=pl.col(r"^G\w{3}_WKBP$").is_between(time(3, 40), time(8, 45))
+            | pl.col(r"^G\w{3}_WKBP$").eq(time(2, 50))
+        )
     )
 
 
