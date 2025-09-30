@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.15.5"
+__generated_with = "0.16.1"
 app = marimo.App(width="medium")
 
 
@@ -344,32 +344,74 @@ def _(df, pb, update_time_for_g126_slpt):
 
 @app.cell
 def _(pb, validate_slp):
-    validate_slp.get_step_report(1, columns_subset=pb.matches("ID|G126_(SLPT|BPSL)"))
+    validate_slp.get_step_report(1, columns_subset=pb.matches("ID|G126_(SLPT|BPSL)"), limit=None)
     return
 
 
 @app.cell
 def _(pb, validate_slp):
-    validate_slp.get_step_report(2, columns_subset=pb.matches("ID|G126_(WKBP|WKT)"))
+    validate_slp.get_step_report(2, columns_subset=pb.matches("ID|G126_(WKBP|WKT)"), limit=None)
     return
 
 
 @app.cell
 def _(pb, validate_slp):
-    validate_slp.get_step_report(3, columns_subset=pb.matches("ID|G222_(SLPT|BPSL)"))
+    validate_slp.get_step_report(3, columns_subset=pb.matches("ID|G222_(SLPT|BPSL)"), limit=None)
     return
 
 
 @app.cell
 def _(pb, validate_slp):
-    validate_slp.get_step_report(4, columns_subset=pb.matches("ID|G222_(WKBP|WKT)"))
+    validate_slp.get_step_report(4, columns_subset=pb.matches("ID|G222_(WKBP|WKT)"), limit=None)
     return
 
 
 @app.cell
-def _(df, pl):
-    # Investigate cases for G222_WKT that were in the afternoon/evening
-    df.select("ID", "G222_SLPT", "G222_WKT").filter(pl.col("G222_WKT").is_not_null()).sort(by="G222_WKT", descending=True).head()
+def _(df, pl, time):
+    # Investigate strange values for G126_BPSL
+    df.select("ID", "G126_BPSL", "G126_SLPT").filter(pl.col("G126_BPSL").is_between(time(0), time(1)))
+    return
+
+
+@app.cell
+def _(df, pl, time):
+    # Investigate strange values for G222_SLPT
+    df.select("ID", "G222_SLPT", "G222_BPSL", "G222_WKT").filter(pl.col("G222_SLPT").is_between(time(0), time(10)))
+    return
+
+
+@app.cell
+def _(df, pl, time):
+    # Investigate strange values for G222_SLPT
+    df.select("ID", "G222_SLPT", "G222_BPSL", "G222_WKT").filter(pl.col("G222_SLPT").is_between(time(10), time(12)))
+    return
+
+
+@app.cell
+def _(df, pl, time):
+    # Investigate cases for G222_WKT
+    df.select("ID", "G222_SLPT", "G222_WKT", "G222_WKBP").filter(~pl.col("G222_WKT").is_between(time(4, 30), time(7, 30)))
+    return
+
+
+@app.cell
+def _(df, pl, time):
+    # Investigate cases for G222_WKBP
+    df.select("ID", "G222_SLPT", "G222_WKT", "G222_WKBP").filter(~pl.col("G222_WKBP").is_between(time(4, 30), time(7, 30)))
+    return
+
+
+@app.cell
+def _(df, pl, time):
+    # Investigate cases for G126_WKT
+    df.select("ID", "G126_SLPT", "G126_WKT", "G126_WKBP").filter(~pl.col("G126_WKT").is_between(time(4, 30), time(7, 30)))
+    return
+
+
+@app.cell
+def _(df, pl, time):
+    # Investigate cases for G126_WKBP
+    df.select("ID", "G126_SLPT", "G126_WKT", "G126_WKBP").filter(~pl.col("G126_WKBP").is_between(time(4, 30), time(7, 30)))
     return
 
 
@@ -377,24 +419,6 @@ def _(df, pl):
 def _(df, pl):
     # Investigate cases for G222_SPRAT where the set up time was in the morning (in one case at 2am?)
     df.select("ID", "G222_SPRAT").filter(pl.col("G222_SPRAT").is_not_null()).sort(by="G222_SPRAT", descending=False).head()
-    return
-
-
-@app.cell
-def _():
-    # validation_misc = (
-    #     pb.Validate(data=df)
-    #     .col_vals_between(
-    #         columns=pb.matches(r"SHR\d"),
-    #         left=27,
-    #         right=135,
-    #         na_pass=True,
-    #         pre=lambda df: df.with_columns(pl.col(r"^.*SHR\d$").replace({-99: None, -88: None})),
-    #     )
-    #     .interrogate()
-    # )
-
-    # validation_misc
     return
 
 
