@@ -1,15 +1,16 @@
 from functools import reduce
 from pathlib import Path
-from typing import Callable, Literal, TypeAlias
+from typing import Callable, NamedTuple, TypeAlias
 
 import banksia as bk
 import polars as pl
 from polars import DataFrame
 
-from blood_pressure.config import INTERIM_DATA, RAW_DATA
+from blood_pressure.config import DATASETS, INTERIM_DATA, PROJECT_ROOT, RAW_DATA
 
 __all__ = [
     "apply_pipeline",
+    "make_changelog",
     "make_interim_datasets",
     "read_all_datasets",
     "transform_datasets",
@@ -68,9 +69,7 @@ def transform_datasets(
     }
 
 
-def make_interim(
-    file: Dataset, raw: Path = RAW_DATA
-) -> tuple[pl.DataFrame, pl.DataFrame]:
+def make_interim(file: Dataset, raw: Path = RAW_DATA) -> tuple[pl.DataFrame, pl.DataFrame]:
     """
     Make the initial transformations from RAW to INTERIM data.
     """
@@ -92,3 +91,27 @@ def make_interim_datasets(
     for name, dset in datasets.items():
         df, meta = make_interim(dset, RAW_DATA)
         bk.write_sav(INTERIM_DATA / dset["file"], df, meta)
+
+
+class VariableChange(NamedTuple):
+    file: str
+    variable: str
+    renamed_to: str | None
+    status: str
+
+
+def _extract_changes(ds: dict) -> list[VariableChange]:
+    file = ds["file"]
+    return [
+        *[VariableChange(file, var, None, "harmonised") for var in ds["variables"] if var != "ID"],
+        *[VariableChange(file, old, new, "renamed") for old, new in ds["rename"].items()],
+        *[VariableChange(file, var, None, "deleted") for var in ds["delete"]],
+    ]
+
+
+def make_changelog() -> None:
+    """
+    Create a CSV file to provide a user-friendly way of understanding which variables were changed.
+    """
+    changes = [change._asdict() for ds in DATASETS.values() for change in _extract_changes(ds)]
+    pl.DataFrame(changes).write_csv(PROJECT_ROOT / "Changelog.csv")

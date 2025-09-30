@@ -1,6 +1,11 @@
 import banksia as bk
 
-from blood_pressure import DATA_TRANSFORMS, make_interim_datasets, transform_datasets
+from blood_pressure import (
+    DATA_TRANSFORMS,
+    make_changelog,
+    make_interim_datasets,
+    transform_datasets,
+)
 from blood_pressure.config import DATASETS, INTERIM_DATA, METADATA, PROCESSED_DATA
 
 
@@ -25,6 +30,9 @@ def main():
         print(f"Writing {name}...")
         bk.write_sav(PROCESSED_DATA / dset["file"], transformed_dfs[name], transformed_metas[name])
         print(f"{name} saved.")
+
+    # Create changelog
+    make_changelog()
 
 
 if __name__ == "__main__":
