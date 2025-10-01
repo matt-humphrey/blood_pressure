@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] Finalise README
+
 
 ## On Hold
 
@@ -34,6 +34,15 @@
 
 ## Done
 
+### Higher Level
+
+- [x] Create a main script which makes new interim data and processes it
+- [x] Turn `validate.py` into a legitimate test with pytest - can run tests to ensure changes are correct
+    - [x] Write tests from the beginning for validations and testing harmonisation functions
+    - [x] Use as part of the data exploration phase
+- [x] Write tests to check transformation from raw to interim datasets
+- [x] Write tests to check transformation from interim to processed datasets
+
 ### Project-specific
 
 - [x] Read through all relevant questionnaire/coding versions and identify related variables
@@ -63,12 +72,5 @@
 - [x] Incorporate BPTIME CSV
 - [x] Create changelog (CSV/XLSX) file to outline all variables that have been changed, renamed, and/or deleted
 - [x] Fill out tracking log for each file
-
-### Higher Level
-
-- [x] Create a main script which makes new interim data and processes it
-- [x] Turn `validate.py` into a legitimate test with pytest - can run tests to ensure changes are correct
-    - [x] Write tests from the beginning for validations and testing harmonisation functions
-    - [x] Use as part of the data exploration phase
-- [x] Write tests to check transformation from raw to interim datasets
-- [x] Write tests to check transformation from interim to processed datasets
+- [x] Finalise README
+- [x] Update status and categories for variables in value_labels

@@ -82,7 +82,10 @@ def offset_time(col: str, offset: str = "12h") -> pl.Expr:
 
 def round_time(col: str, by: str = "1m") -> pl.Expr:
     """
-    Create a Polars Expression to offset a column with dtype Time by a given amount
+    Create a Polars Expression to offset a column with dtype Time by a given amount.
+
+    This function converts the time column to a datetime object, because Polars can't perform
+    arithmetic on time objects, and adds 12 hours, before converting back to a time object.
     """
     return (
         pl.datetime(2000, 1, 1)  # add arbitary date to enable arithmetic on datetime object
@@ -96,9 +99,6 @@ def round_time(col: str, by: str = "1m") -> pl.Expr:
 def update_g126_slpt(df: DataFrame) -> DataFrame:
     """
     Convert times from AM to PM for `G126_SLPT`.
-
-    This function converts the time column to a datetime object, because Polars can't perform
-    arithmetic on time objects, and adds 12 hours, before converting back to a time object.
     """
     return df.with_columns(offset_time("G126_SLPT", "12h"))
 

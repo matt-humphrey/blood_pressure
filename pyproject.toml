@@ -14,7 +14,8 @@ dependencies = [
 [dependency-groups]
 dev = [
     "altair>=5.5.0",
-    "marimo>=0.15.5",
+    "fastexcel>=0.16.0",
+    "marimo>=0.16.0",
     "pytest>=8.4.1",
     "ruff>=0.13.0",
     "watchdog>=6.0.0",
